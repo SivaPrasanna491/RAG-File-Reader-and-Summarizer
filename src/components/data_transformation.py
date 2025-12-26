@@ -3,7 +3,7 @@ import sys
 
 from src.exception import CustomException
 from src.logger import logging
-from langchain_community.text_splitters import RecursiveCharacterTextSplitter
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import Chroma, FAISS, LanceDB
 from langchain_ollama import OllamaEmbeddings
 
