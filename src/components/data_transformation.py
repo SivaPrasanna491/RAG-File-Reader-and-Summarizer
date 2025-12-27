@@ -6,6 +6,7 @@ from src.logger import logging
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import Chroma, FAISS, LanceDB
 from langchain_ollama import OllamaEmbeddings
+from src.utils import get_file_type
 
 class DataTransformation():
     def __init__(self, documents, file_name):
@@ -15,26 +16,31 @@ class DataTransformation():
     def transformDocuments(self):
         try:
             ext = os.path.splitext(self.file_name)
-            if ext[1] == '.txt':
+            extension = ext[1]
+            
+            if extension == '':
+                extension = get_file_type(file_path=self.file_name)
+                
+            if extension == '.txt':
                 splitter = RecursiveCharacterTextSplitter(chunk_size = 2000, chunk_overlap = 500)
                 docs = splitter.split_documents(self.documents)
                 logging.info("Dividing the documents into chunks is completed successfully")
-                db = Chroma.from_documents(documents=docs, embedding=OllamaEmbeddings(model='nomic-embed-text:v1.5'))
+                db = Chroma.from_documents(documents=docs[:30], embedding=OllamaEmbeddings(model='nomic-embed-text:v1.5'))
                 logging.info("Storing the chunked documents into vector store completed successfully")
                 return db
             
-            elif ext[1] == '.pdf':
+            elif extension == '.pdf':
                 splitter = RecursiveCharacterTextSplitter(chunk_size = 2000, chunk_overlap = 500)
                 docs = splitter.split_documents(self.documents)
                 logging.info("Dividing the documents into chunks is completed successfully")
-                db = FAISS.from_documents(documents=docs, embedding=OllamaEmbeddings(model='snowflake-arctic-embed:335m'))
+                db = FAISS.from_documents(documents=docs[:30], embedding=OllamaEmbeddings(model='snowflake-arctic-embed:335m'))
                 logging.info("Storing the chunked documents into vector store completed successfully")
                 return db
             
             splitter = RecursiveCharacterTextSplitter(chunk_size = 2000, chunk_overlap = 500)
             docs = splitter.split_documents(self.documents)
             logging.info("Dividing the documents into chunks is completed successfully")
-            db = LanceDB.from_documents(documents=docs, embedding=OllamaEmbeddings(model='nomic-embed-text:v1.5'))
+            db = LanceDB.from_documents(documents=docs[:30], embedding=OllamaEmbeddings(model='nomic-embed-text:v1.5'))
             logging.info("Storing the chunked documents into vector store completed successfully")
             return db
         

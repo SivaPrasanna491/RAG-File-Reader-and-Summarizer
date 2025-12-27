@@ -4,6 +4,7 @@ import sys
 from src.exception import CustomException
 from src.logger import logging
 from langchain_community.document_loaders import TextLoader, PyPDFLoader, UnstructuredExcelLoader
+from src.utils import get_file_type
 
 class DataIngestion:
     def __init__(self, file_name):
@@ -12,14 +13,18 @@ class DataIngestion:
     def loadFile(self):
         try:    
             ext = os.path.splitext(self.file_name)
+            extension = ext[1]
+            
+            if(extension == ''):
+                extension = get_file_type(file_path=self.file_name)
             logging.info("Extension of the file extracted successfully")
             
-            if ext[1] == ".txt":
+            if extension == ".txt":
                 loader = TextLoader(file_path = self.file_name)
                 logging.info("File loaded successfully")
                 return loader.load()
             
-            elif ext[1] == ".pdf":
+            elif extension == ".pdf":
                 loader = PyPDFLoader(file_path = self.file_name)
                 logging.info("File loaded successfully")
                 return loader.load()

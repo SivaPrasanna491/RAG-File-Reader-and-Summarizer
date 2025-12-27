@@ -7,12 +7,13 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_classic.chains.combine_documents import create_stuff_documents_chain
 from langchain_community.llms import Ollama
 from langchain_classic.chains import create_retrieval_chain
+from src.utils import get_file_type
 
 class ModelTraining():
     def __init__(self, db, query, file_name):
         self.db = db
         self.query = query
-        self.file_path = file_name
+        self.file_name = file_name
     
     def getContext(self):
         try:
@@ -35,7 +36,12 @@ class ModelTraining():
             Question: {input}""")
             
             ext = os.path.splitext(self.file_name)
-            if ext[1] == '.txt':
+            extension = ext[1]
+            
+            if extension == '':
+                extension = get_file_type(file_path=self.file_name)
+                
+            if extension == '.txt':
                 llm = Ollama(model='llama2')
                 document_chain = create_stuff_documents_chain(llm=llm, prompt=prompt)
                 logging.info("Chain created successfully")
@@ -50,7 +56,7 @@ class ModelTraining():
                 )
                 return reponse['answer']
             
-            elif ext[1] == '.pdf':
+            elif extension == '.pdf':
                 llm = Ollama(model='mistral')
                 document_chain = create_stuff_documents_chain(llm=llm, prompt=prompt)
                 logging.info("Chain created successfully")
