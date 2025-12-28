@@ -7,8 +7,9 @@ from langchain_community.document_loaders import TextLoader, PyPDFLoader, Unstru
 from src.utils import get_file_type
 
 class DataIngestion:
-    def __init__(self, file_name):
+    def __init__(self, file_name, loaders):
         self.file_name = file_name
+        self.loaders = loaders
         
     def loadFile(self):
         try:    
@@ -19,19 +20,10 @@ class DataIngestion:
                 extension = get_file_type(file_path=self.file_name)
             logging.info("Extension of the file extracted successfully")
             
-            if extension == ".txt":
-                loader = TextLoader(file_path = self.file_name)
-                logging.info("File loaded successfully")
-                return loader.load()
-            
-            elif extension == ".pdf":
-                loader = PyPDFLoader(file_path = self.file_name)
-                logging.info("File loaded successfully")
-                return loader.load()
-            
-            loader = UnstructuredExcelLoader(file_path = self.file_name)
-            logging.info("File loaded successfully")
-            return loader.load()
+            loader = self.loaders.get(extension)
+            docs = loader().load()
+            logging.info("Loading the data source done successfully")
+            return docs
         except Exception as e:
             raise CustomException(e, sys)
 

@@ -2,6 +2,8 @@ import magic
 import os
 import sys
 
+from langchain_community.llms import Ollama
+
 def get_file_type(file_path):
     mime = magic.from_file(file_path, mime=True)
     
@@ -17,4 +19,4 @@ def get_file_type(file_path):
     
     else:
         return None
-    
+

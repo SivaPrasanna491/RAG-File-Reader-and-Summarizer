@@ -10,10 +10,11 @@ from langchain_classic.chains import create_retrieval_chain
 from src.utils import get_file_type
 
 class ModelTraining():
-    def __init__(self, db, query, file_name):
+    def __init__(self, db, query, file_name, models):
         self.db = db
         self.query = query
         self.file_name = file_name
+        self.models = models
     
     def getContext(self):
         try:
@@ -41,49 +42,18 @@ class ModelTraining():
             if extension == '':
                 extension = get_file_type(file_path=self.file_name)
                 
-            if extension == '.txt':
-                llm = Ollama(model='llama2')
-                document_chain = create_stuff_documents_chain(llm=llm, prompt=prompt)
-                logging.info("Chain created successfully")
-                retriever = self.db.as_retriever()
-                logging.info("Retriever created successfully")
-                retrieverChain = create_retrieval_chain(retriever, document_chain)
-                logging.info("Chain and Retriever combined successfully")
-                reponse = retrieverChain.invoke(
-                    {
-                        "input": self.query
-                    }
-                )
-                return reponse['answer']
-            
-            elif extension == '.pdf':
-                llm = Ollama(model='mistral')
-                document_chain = create_stuff_documents_chain(llm=llm, prompt=prompt)
-                logging.info("Chain created successfully")
-                retriever = self.db.as_retriever()
-                logging.info("Retriever created successfully")
-                retrieverChain = create_retrieval_chain(retriever, document_chain)
-                logging.info("Chain and Retriever combined successfully")
-                reponse = retrieverChain.invoke(
-                    {
-                        "input": self.query
-                    }
-                )
-                return reponse['answer']
-            
-            llm = Ollama(model='qwen3:0.6b')
-            document_chain = create_stuff_documents_chain(llm=llm, prompt=prompt)
-            logging.info("Chain created successfully")
+            logging.info("File extension loaded successfully")
+            llm = Ollama(model=self.models.get(extension))
+            document_chain = create_stuff_documents_chain(llm=llm, prompt=prompt)        
             retriever = self.db.as_retriever()
-            logging.info("Retriever created successfully")
-            retrieverChain = create_retrieval_chain(retriever, document_chain)
-            logging.info("Chain and Retriever combined successfully")
-            reponse = retrieverChain.invoke(
+            logging.info("Chain and Retriever initialized successfully")
+            retrieval_chain = create_retrieval_chain(retriever, document_chain)
+            response = retrieval_chain.invoke(
                 {
                     "input": self.query
                 }
             )
-            return reponse['answer']
-        
+            logging.info("Chain and Retriever combined and response produced successfully")
+            return response['answer']
         except Exception as e:
             raise CustomException(e, sys)
