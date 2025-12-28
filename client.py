@@ -9,6 +9,24 @@ st.set_page_config(
     layout="centered"
 )
 
+# --- PERSISTENCE LOGIC (Local Storage / URL Params) ---
+# This ensures that if the user reloads the page, they stay on the "Query" screen
+# if they have already successfully uploaded a file.
+query_params = st.query_params
+current_page = query_params.get("page", "upload")
+
+# Initialize session state based on URL param
+if current_page == "query":
+    if 'file_uploaded' not in st.session_state:
+        st.session_state.file_uploaded = True
+else:
+    # Default state
+    if 'file_uploaded' not in st.session_state:
+        st.session_state.file_uploaded = False
+
+if 'response' not in st.session_state:
+    st.session_state.response = None
+
 # Custom CSS for dark mode
 st.markdown("""
 <style>
@@ -105,20 +123,8 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # API endpoints
-UPLOAD_URL = "http://localhost:8000/upload"
-QUERY_URL = "http://localhost:8000/query/invoke"
-
-# --- PERSISTENCE LOGIC ---
-# Initialize session state from Query Params (URL)
-# This allows the state to survive a page reload
-if "page" in st.query_params and st.query_params["page"] == "query":
-    if 'file_uploaded' not in st.session_state:
-        st.session_state.file_uploaded = True
-
-if 'file_uploaded' not in st.session_state:
-    st.session_state.file_uploaded = False
-if 'response' not in st.session_state:
-    st.session_state.response = None
+UPLOAD_URL = "http://127.0.0.1:8000/upload"
+QUERY_URL = "http://127.0.0.1:8000/query/invoke"
 
 # Title
 st.markdown("<h1>📄 RAG File Reader & Summarizer</h1>", unsafe_allow_html=True)
@@ -130,8 +136,8 @@ if not st.session_state.file_uploaded:
     
     uploaded_file = st.file_uploader(
         "Choose a file",
-        type=['pdf', 'txt', 'xlsx', 'xls'],
-        help="Supported formats: PDF, TXT, Excel"
+        type=['pdf', 'txt', 'xlsx', 'xls', 'docx'],
+        help="Supported formats: PDF, TXT, Excel, Word"
     )
     
     if uploaded_file is not None:
@@ -146,7 +152,7 @@ if not st.session_state.file_uploaded:
                     
                     if response.status_code == 200:
                         st.session_state.file_uploaded = True
-                        # Update URL to persist state
+                        # Update URL to persist state (Local Storage behavior)
                         st.query_params["page"] = "query"
                         st.success("✅ File uploaded successfully! You can now ask questions.")
                         st.rerun()
@@ -185,6 +191,7 @@ else:
                 try:
                     # Send query to backend
                     payload = {"input": {"query": query}}
+                    # Use 127.0.0.1 to avoid localhost issues
                     response = requests.post(QUERY_URL, json=payload)
                     
                     if response.status_code == 200:

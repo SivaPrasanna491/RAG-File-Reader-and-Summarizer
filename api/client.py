@@ -124,8 +124,8 @@ if not st.session_state.file_uploaded:
     
     uploaded_file = st.file_uploader(
         "Choose a file",
-        type=['pdf', 'txt', 'xlsx', 'xls'],
-        help="Supported formats: PDF, TXT, Excel"
+        type=['pdf', 'txt', 'xlsx', 'xls', 'csv', 'docx'],
+        help="Supported formats: PDF, TXT, Excel, csv, docx"
     )
     
     if uploaded_file is not None:

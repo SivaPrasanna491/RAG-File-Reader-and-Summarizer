@@ -8,6 +8,8 @@ from langchain_classic.chains.combine_documents import create_stuff_documents_ch
 from langchain_community.llms import Ollama
 from langchain_classic.chains import create_retrieval_chain
 from src.utils import get_file_type
+from dotenv import load_dotenv
+from langchain_groq import ChatGroq
 
 class ModelTraining():
     def __init__(self, db, query, file_name, models):
@@ -36,6 +38,9 @@ class ModelTraining():
 
             Question: {input}""")
             
+            load_dotenv()
+            os.environ['GROQ_API_KEY'] = os.getenv("GROQ_API_KEY")
+            
             ext = os.path.splitext(self.file_name)
             extension = ext[1]
             
@@ -43,7 +48,13 @@ class ModelTraining():
                 extension = get_file_type(file_path=self.file_name)
                 
             logging.info("File extension loaded successfully")
-            llm = Ollama(model=self.models.get(extension))
+            llm = ChatGroq(
+                model=self.models.get(extension),
+                temperature=0,max_tokens=None,  
+                # reasoning_format="parsed",
+                timeout=None,
+                max_retries=2,
+            )
             document_chain = create_stuff_documents_chain(llm=llm, prompt=prompt)        
             retriever = self.db.as_retriever()
             logging.info("Chain and Retriever initialized successfully")

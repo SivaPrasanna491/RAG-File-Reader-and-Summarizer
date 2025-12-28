@@ -11,4 +11,8 @@ langchain-text-splitters
 chromadb
 lancedb
 faissdb
-# -e .
+python-magic
+python-magic-bin
+dotenv
+langchain-groq
+-e .

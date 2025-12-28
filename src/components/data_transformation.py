@@ -24,9 +24,14 @@ class DataTransformation():
                 
             docs = RecursiveCharacterTextSplitter(chunk_size=2000, chunk_overlap=500).split_documents(self.documents)
             logging.info("Documents splitting done successfully")
-            db = self.databases.get(extension).from_documents(documents=docs[:20], embedding=OllamaEmbeddings(model=self.embeddings.get(extension)))
-            logging.info("Chunks stored in vector database successfully")
-            return db
+            if(len(docs) > 0):
+                try:
+                    db = self.databases.get(extension).from_documents(documents=docs[:20], embedding=OllamaEmbeddings(model=self.embeddings.get(extension)))
+                    logging.info("Documents splitting done successfully")
+                    logging.info("Chunks stored in vector database successfully")
+                    return db
+                except Exception as e:
+                    raise CustomException(e, sys)
         except Exception as e:
             raise CustomException(e, sys)
     
