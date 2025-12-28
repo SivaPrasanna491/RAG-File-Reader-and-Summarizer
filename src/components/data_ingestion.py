@@ -21,7 +21,7 @@ class DataIngestion:
             logging.info("Extension of the file extracted successfully")
             
             loader = self.loaders.get(extension)
-            docs = loader().load()
+            docs = loader(self.file_name).load()
             logging.info("Loading the data source done successfully")
             return docs
         except Exception as e:

@@ -25,7 +25,7 @@ document_loaders = {
     ".pdf": PyPDFLoader,
     ".xlsx": UnstructuredExcelLoader,
     ".csv": CSVLoader,
-    ".docs": DocxLoader
+    ".docx": DocxLoader
 }
 
 vector_db = {
@@ -33,7 +33,7 @@ vector_db = {
     ".pdf": FAISS,
     ".xlsx": LanceDB,
     ".csv": FAISS,
-    ".docs": Chroma
+    ".docx": Chroma
 }
 
 vector_embeddings = {
@@ -41,7 +41,7 @@ vector_embeddings = {
     ".pdf": "snowflake-arctic-embed:335m",
     ".xlsx": "nomic-embed-text:v1.5",
     ".csv": "nomic-embed-text:v1.5",
-    ".docs": "snowflake-arctic-embed:335m"
+    ".docx": "snowflake-arctic-embed:335m"
 }
 
 models = {
@@ -49,7 +49,7 @@ models = {
     ".pdf": "mistral",
     ".xlsx": "qwen3:0.6b",
     ".csv": "gemma3:270m",
-    ".docs": "all-minilm:22m"
+    ".docx": "all-minilm:22m"
 }
 
 @app.post("/upload")
